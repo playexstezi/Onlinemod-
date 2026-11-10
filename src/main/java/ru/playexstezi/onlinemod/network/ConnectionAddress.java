@@ -62,7 +62,7 @@ public record ConnectionAddress(String host, int port) {
                 return Optional.empty();
             }
             return Optional.of(new ConnectionAddress(host, port));
-        } catch (NumberFormatException | IllegalArgumentException ignored) {
+        } catch (IllegalArgumentException ignored) {
             return Optional.empty();
         }
     }
