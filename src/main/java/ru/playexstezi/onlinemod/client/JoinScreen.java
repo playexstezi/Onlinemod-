@@ -10,24 +10,21 @@ import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import net.minecraft.network.chat.Component;
 import ru.playexstezi.onlinemod.network.ConnectionAddress;
 
-/**
- * Connects to a friend using a host:port address through Minecraft's normal
- * multiplayer connection flow.
- */
+/** Connects through Minecraft's normal multiplayer connection pipeline. */
 public final class JoinScreen extends Screen {
     private final Screen parent;
     private EditBox addressInput;
     private String error = "";
 
     public JoinScreen(Screen parent) {
-        super(Component.literal("Join Online Mod session"));
+        super(Component.translatable("onlinemod.screen.join.title"));
         this.parent = parent;
     }
 
     @Override
     protected void init() {
         int center = this.width / 2;
-        int buttonWidth = 200;
+        int buttonWidth = Math.min(220, this.width - 40);
         int buttonX = center - buttonWidth / 2;
 
         this.addressInput = new EditBox(
@@ -36,19 +33,19 @@ public final class JoinScreen extends Screen {
                 this.height / 2 - 20,
                 buttonWidth,
                 20,
-                Component.literal("Server address")
+                Component.translatable("onlinemod.label.server_address")
         );
         this.addressInput.setMaxLength(255);
         this.addressInput.setHint(Component.literal("example.com:25565"));
         this.addRenderableWidget(this.addressInput);
 
         this.addRenderableWidget(Button.builder(
-                Component.literal("Connect"),
+                Component.translatable("onlinemod.button.connect"),
                 button -> connect()
         ).bounds(buttonX, this.height / 2 + 12, buttonWidth, 20).build());
 
         this.addRenderableWidget(Button.builder(
-                Component.literal("Back"),
+                Component.translatable("gui.back"),
                 button -> Minecraft.getInstance().setScreen(parent)
         ).bounds(buttonX, this.height / 2 + 40, buttonWidth, 20).build());
 
@@ -56,46 +53,38 @@ public final class JoinScreen extends Screen {
     }
 
     private void connect() {
-        String input = this.addressInput.getValue();
-        var parsed = ConnectionAddress.parse(input);
+        var parsed = ConnectionAddress.parse(this.addressInput.getValue());
         if (parsed.isEmpty()) {
-            this.error = "Enter an address in host:port format.";
+            this.error = "onlinemod.error.invalid_address";
             return;
         }
 
         ConnectionAddress endpoint = parsed.get();
         ServerAddress serverAddress = new ServerAddress(endpoint.host(), endpoint.port());
-        ConnectScreen.startConnecting(
-                this,
-                Minecraft.getInstance(),
-                serverAddress,
-                null,
-                false
-        );
+        ConnectScreen.startConnecting(this, Minecraft.getInstance(), serverAddress, null, false);
     }
 
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         this.renderBackground(graphics);
-        graphics.drawCenteredString(this.font, this.title, this.width / 2, this.height / 2 - 70, 0xFFFFFF);
+        graphics.drawCenteredString(this.font, this.title, this.width / 2, this.height / 2 - 70, 0xFFFFFFFF);
         graphics.drawCenteredString(
                 this.font,
-                Component.literal("Enter the address shared by the host (host:port)."),
+                Component.translatable("onlinemod.label.join_hint"),
                 this.width / 2,
                 this.height / 2 - 48,
-                0xD0D0D0
+                0xFFD0D8E2
         );
 
         if (!this.error.isEmpty()) {
             graphics.drawCenteredString(
                     this.font,
-                    Component.literal(this.error),
+                    Component.translatable(this.error),
                     this.width / 2,
                     this.height / 2 + 70,
-                    0xFF7777
+                    0xFFFF7777
             );
         }
-
         super.render(graphics, mouseX, mouseY, partialTick);
     }
 }
