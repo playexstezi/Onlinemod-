@@ -57,7 +57,7 @@ public final class PublicIpService {
                 .exceptionallyCompose(error -> tryProvider(index + 1));
     }
 
-    private static Optional<String> validateIpv4(String value) {
+    static Optional<String> validateIpv4(String value) {
         String[] parts = value.split("\\.", -1);
         if (parts.length != 4) {
             return Optional.empty();
