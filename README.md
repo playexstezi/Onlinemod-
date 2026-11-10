@@ -2,7 +2,7 @@
 
 A host/join mod for Minecraft Java 1.20.1 + Minecraft Forge 47.x. The goal is to let a player open a single-player world and invite friends without requiring every player to use a third-party LAN VPN.
 
-> Current status: early testing build. The host and join screens, public IPv4 lookup, local IPv4 discovery, LAN publication, and address validation are implemented. Internet play still requires manual router/firewall configuration; the mod does not automatically open router ports or bypass CGNAT.
+> Current status: early testing build. The host and join screens, public IPv4 lookup, local IPv4 discovery, LAN publication, address validation, and optional user-triggered UPnP IGD port mapping are implemented. Internet play still depends on router support, host firewall permission, and ISP routing; UPnP cannot bypass CGNAT.
 
 ## Current features
 
