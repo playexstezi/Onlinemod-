@@ -6,7 +6,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import net.minecraft.network.chat.Component;
 import ru.playexstezi.onlinemod.network.ConnectionAddress;
@@ -66,17 +65,11 @@ public final class JoinScreen extends Screen {
 
         ConnectionAddress endpoint = parsed.get();
         ServerAddress serverAddress = new ServerAddress(endpoint.host(), endpoint.port());
-        ServerData serverData = new ServerData(
-                "Online Mod",
-                endpoint.format(),
-                ServerData.Type.OTHER
-        );
-
         ConnectScreen.startConnecting(
                 this,
                 Minecraft.getInstance(),
                 serverAddress,
-                serverData,
+                null,
                 false
         );
     }
