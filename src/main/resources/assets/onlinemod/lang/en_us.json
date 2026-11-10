@@ -37,5 +37,13 @@
   "onlinemod.error.invalid_address": "Enter a valid address in host:port format.",
   "onlinemod.button.copy_public_candidate": "Copy public address candidate",
   "onlinemod.status.public_candidate_not_ready": "Open a world and wait for the public IP first.",
-  "onlinemod.status.public_candidate_copied": "Address copied. It works only after router and firewall setup."
+  "onlinemod.status.public_candidate_copied": "Address copied. It works only after router and firewall setup.",
+  "onlinemod.button.upnp_toggle": "Enable / disable UPnP",
+  "onlinemod.status.upnp_needs_host": "Start hosting and wait for the local IP first.",
+  "onlinemod.status.upnp_searching": "Discovering router and requesting a TCP port…",
+  "onlinemod.status.upnp_active": "Router accepted a temporary TCP port mapping.",
+  "onlinemod.status.upnp_failed": "Could not configure UPnP.",
+  "onlinemod.status.upnp_closing": "Removing UPnP mapping…",
+  "onlinemod.status.upnp_closed": "UPnP mapping removed.",
+  "onlinemod.status.upnp_cleanup_failed": "Could not confirm UPnP mapping removal."
 }
