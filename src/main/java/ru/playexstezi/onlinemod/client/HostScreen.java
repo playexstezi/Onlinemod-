@@ -11,62 +11,65 @@ import ru.playexstezi.onlinemod.network.PublicIpService;
 
 import java.util.Optional;
 
-/**
- * First host-management screen. It intentionally labels the published port
- * as LAN-only until router mapping and external reachability are implemented.
- */
+/** Host controls for the current integrated single-player world. */
 public final class HostScreen extends Screen {
     private final Screen parent;
-    private String publicIp = "Checking...";
-    private String status = "No online session started.";
+    private String publicIp = "onlinemod.status.checking";
+    private String status = "onlinemod.status.idle";
     private int publishedPort = -1;
 
     public HostScreen(Screen parent) {
-        super(Component.literal("Online Mod"));
+        super(Component.translatable("onlinemod.screen.host.title"));
         this.parent = parent;
     }
 
     @Override
     protected void init() {
         int center = this.width / 2;
-        int buttonWidth = 200;
+        int buttonWidth = Math.min(220, this.width - 40);
         int buttonX = center - buttonWidth / 2;
-        int top = this.height / 2 - 48;
+        int top = this.height / 2 - 62;
+        int step = 24;
 
         this.addRenderableWidget(Button.builder(
-                Component.literal("Start hosting"),
+                Component.translatable("onlinemod.button.start_hosting"),
                 button -> startHosting()
         ).bounds(buttonX, top, buttonWidth, 20).build());
 
         this.addRenderableWidget(Button.builder(
-                Component.literal("Stop hosting"),
+                Component.translatable("onlinemod.button.stop_hosting"),
                 button -> stopHosting()
-        ).bounds(buttonX, top + 26, buttonWidth, 20).build());
+        ).bounds(buttonX, top + step, buttonWidth, 20).build());
 
         this.addRenderableWidget(Button.builder(
-                Component.literal("Join friend's world"),
+                Component.translatable("onlinemod.button.join_friend"),
                 button -> Minecraft.getInstance().setScreen(new JoinScreen(this))
-        ).bounds(buttonX, top + 52, buttonWidth, 20).build());
+        ).bounds(buttonX, top + step * 2, buttonWidth, 20).build());
 
         this.addRenderableWidget(Button.builder(
-                Component.literal("Refresh public IP"),
+                Component.translatable("onlinemod.button.refresh_ip"),
                 button -> refreshPublicIp()
-        ).bounds(buttonX, top + 78, buttonWidth, 20).build());
+        ).bounds(buttonX, top + step * 3, buttonWidth, 20).build());
 
         this.addRenderableWidget(Button.builder(
-                Component.literal("Back"),
+                Component.translatable("onlinemod.button.copy_ip"),
+                button -> copyPublicIp()
+        ).bounds(buttonX, top + step * 4, buttonWidth, 20).build());
+
+        this.addRenderableWidget(Button.builder(
+                Component.translatable("gui.back"),
                 button -> Minecraft.getInstance().setScreen(parent)
-        ).bounds(buttonX, top + 110, buttonWidth, 20).build());
+        ).bounds(buttonX, top + step * 5 + 5, buttonWidth, 20).build());
 
         refreshPublicIp();
         refreshSessionState();
     }
 
     private void refreshPublicIp() {
-        this.publicIp = "Checking...";
+        this.publicIp = "onlinemod.status.checking";
         PublicIpService.discoverIpv4().thenAccept(result ->
                 Minecraft.getInstance().execute(() ->
-                        this.publicIp = result.orElse("Unavailable")
+                        this.publicIp = result.orElse("onlinemod.status.unavailable")
                 )
         );
     }
@@ -75,25 +78,35 @@ public final class HostScreen extends Screen {
         Optional<Integer> port = LanHostService.getPublishedPort();
         this.publishedPort = port.orElse(-1);
         if (port.isPresent()) {
-            this.status = "Incoming connections are open on the LAN listener.";
+            this.status = "onlinemod.status.lan_open";
         }
+    }
+
+    private void copyPublicIp() {
+        if ("onlinemod.status.checking".equals(this.publicIp)
+                || "onlinemod.status.unavailable".equals(this.publicIp)) {
+            this.status = "onlinemod.status.ip_not_ready";
+            return;
+        }
+        Minecraft.getInstance().keyboardHandler.setClipboard(this.publicIp);
+        this.status = "onlinemod.status.ip_copied";
     }
 
     private void startHosting() {
         IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
         if (server == null || !server.isRunning()) {
-            this.status = "Open a single-player world first.";
+            this.status = "onlinemod.status.open_world_first";
             return;
         }
 
-        this.status = "Starting LAN listener...";
+        this.status = "onlinemod.status.starting";
         server.execute(() -> {
             Optional<Integer> port = LanHostService.openCurrentWorld(false);
             Minecraft.getInstance().execute(() -> {
                 this.publishedPort = port.orElse(-1);
                 this.status = port.isPresent()
-                        ? "LAN listener started. Router access is not configured."
-                        : "Could not start hosting. Restart the world if it was stopped.";
+                        ? "onlinemod.status.started_lan"
+                        : "onlinemod.status.start_failed";
             });
         });
     }
@@ -101,19 +114,19 @@ public final class HostScreen extends Screen {
     private void stopHosting() {
         IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
         if (server == null || !server.isRunning()) {
-            this.status = "No single-player world is running.";
+            this.status = "onlinemod.status.no_world";
             return;
         }
 
-        this.status = "Closing incoming connections...";
+        this.status = "onlinemod.status.stopping";
         server.execute(() -> {
             boolean stopped = LanHostService.closeIncomingConnections();
             Minecraft.getInstance().execute(() -> {
                 if (stopped) {
                     this.publishedPort = -1;
-                    this.status = "Incoming connections closed. The world is still running.";
+                    this.status = "onlinemod.status.stopped_world_kept";
                 } else {
-                    this.status = "No active host listener was found.";
+                    this.status = "onlinemod.status.no_listener";
                 }
             });
         });
@@ -122,39 +135,42 @@ public final class HostScreen extends Screen {
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         this.renderBackground(graphics);
-        graphics.drawCenteredString(this.font, this.title, this.width / 2, 38, 0xFFFFFF);
+        int center = this.width / 2;
+        int panelWidth = Math.min(360, this.width - 20);
+        int panelLeft = center - panelWidth / 2;
+        int panelTop = this.height / 2 - 92;
+
+        graphics.fill(panelLeft, panelTop, panelLeft + panelWidth, panelTop + 206, 0xB0101722);
+        graphics.fill(panelLeft, panelTop, panelLeft + panelWidth, panelTop + 1, 0xFF4A9BD8);
+
+        graphics.drawCenteredString(this.font, this.title, center, panelTop + 10, 0xFFFFFFFF);
         graphics.drawCenteredString(
                 this.font,
-                Component.literal("Public IPv4: " + this.publicIp),
-                this.width / 2,
-                this.height / 2 - 76,
-                0xD0D0D0
+                Component.translatable("onlinemod.label.public_ip",
+                        Component.translatable(this.publicIp)),
+                center,
+                panelTop + 29,
+                0xFFE5EAF0
         );
 
-        String portText = this.publishedPort > 0
-                ? "Local server port: " + this.publishedPort + " (LAN only)"
-                : "Local server port: not open";
-        graphics.drawCenteredString(
-                this.font,
-                Component.literal(portText),
-                this.width / 2,
-                this.height / 2 - 60,
-                0xD0D0D0
-        );
+        Component portText = this.publishedPort > 0
+                ? Component.translatable("onlinemod.label.port_open", this.publishedPort)
+                : Component.translatable("onlinemod.label.port_closed");
+        graphics.drawCenteredString(this.font, portText, center, panelTop + 43, 0xFFD0D8E2);
 
         graphics.drawCenteredString(
                 this.font,
-                Component.literal(this.status),
-                this.width / 2,
-                this.height / 2 + 100,
-                0xFFFFFF
+                Component.translatable(this.status),
+                center,
+                panelTop + 184,
+                0xFFFFD479
         );
         graphics.drawCenteredString(
                 this.font,
-                Component.literal("A public IP does not mean friends can connect yet."),
-                this.width / 2,
-                this.height / 2 + 114,
-                0xAAAAAA
+                Component.translatable("onlinemod.label.internet_warning"),
+                center,
+                panelTop + 195,
+                0xFFB8C3D0
         );
         super.render(graphics, mouseX, mouseY, partialTick);
     }
