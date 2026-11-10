@@ -118,7 +118,7 @@ public final class UpnpPortMapper {
         cancelRenewal();
         if (mapping == null) return false;
         try {
-            closeMapping(mapping);
+            deleteMapping(mapping);
             return true;
         } catch (Exception exception) {
             OnlineMod.LOGGER.warn("Could not remove UPnP mapping: {}", exception.toString());
@@ -128,13 +128,17 @@ public final class UpnpPortMapper {
 
     private static void closeMapping(Mapping mapping) {
         try {
-            soap(mapping, "DeletePortMapping",
-                    "<NewRemoteHost></NewRemoteHost>"
-                    + "<NewExternalPort>" + mapping.port() + "</NewExternalPort>"
-                    + "<NewProtocol>TCP</NewProtocol>");
+            deleteMapping(mapping);
         } catch (Exception exception) {
             OnlineMod.LOGGER.warn("UPnP mapping cleanup failed: {}", exception.toString());
         }
+    }
+
+    private static void deleteMapping(Mapping mapping) throws Exception {
+        soap(mapping, "DeletePortMapping",
+                "<NewRemoteHost></NewRemoteHost>"
+                + "<NewExternalPort>" + mapping.port() + "</NewExternalPort>"
+                + "<NewProtocol>TCP</NewProtocol>");
     }
 
     private static void scheduleRenewal() {
@@ -291,7 +295,9 @@ public final class UpnpPortMapper {
         byte[] payload = xml.getBytes(StandardCharsets.UTF_8);
         connection.setFixedLengthStreamingMode(payload.length);
         try {
-            connection.getOutputStream().write(payload);
+            try (var output = connection.getOutputStream()) {
+                output.write(payload);
+            }
             int status = connection.getResponseCode();
             if (status != 200) {
                 String detail = "";
