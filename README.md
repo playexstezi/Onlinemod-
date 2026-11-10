@@ -10,7 +10,7 @@ A host/join mod for Minecraft Java 1.20.1 + Minecraft Forge 47.x. The goal is to
 - Join screen from the multiplayer menu and host screen.
 - Public IPv4 discovery through HTTPS providers.
 - Best-effort local IPv4 discovery using the operating system's selected network route.
-- Copy public IP and copy local address plus active server port.
+- Copy public IP, copy local address plus active server port, and copy a clearly marked unverified public address candidate.
 - Vanilla integrated-server LAN publication on an automatically selected TCP port.
 - Stop incoming connections while leaving the single-player world running.
 - Strict host:port parsing for hostnames, IPv4 and bracketed IPv6.
@@ -45,7 +45,7 @@ This is not automatic yet. The host must configure the network:
 1. Start hosting and note Local IPv4 and Server port in Online Mod.
 2. In the router administration interface, create a TCP port-forward rule. Forward the displayed server port to the displayed Local IPv4 using the same internal port.
 3. Allow inbound TCP traffic for Minecraft/Java or that specific port in the host PC firewall.
-4. Keep the world open. The selected port may change next time the world is opened, so re-check the router rule each session.
+4. Keep the world open. The selected port may change next time the world is opened, so re-check the router rule each session. The Copy public address candidate button copies public-ip:port for convenience, but the mod does not test whether it is reachable.
 5. The friend connects using the host's public IPv4 and forwarded port, in public-ip:port format, from a different internet connection.
 
 Only change router settings if you are authorized to administer that network. Do not share router passwords or administrator credentials. If the ISP uses restrictive CGNAT or blocks inbound traffic, port forwarding will not work. A public IP lookup is not a reachability test. UPnP/NAT-PMP, external port testing, and relay hosting are not implemented.
