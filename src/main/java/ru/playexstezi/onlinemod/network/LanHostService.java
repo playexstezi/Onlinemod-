@@ -16,6 +16,9 @@ import java.util.Optional;
 public final class LanHostService {
     private static final int RANDOM_PORT = 0;
 
+    private static IntegratedServer trackedServer;
+    private static boolean incomingConnectionsClosed;
+
     private LanHostService() {
     }
 
@@ -30,6 +33,11 @@ public final class LanHostService {
         IntegratedServer server = minecraft.getSingleplayerServer();
 
         if (server == null || !server.isRunning()) {
+            return Optional.empty();
+        }
+
+        resetStateForDifferentWorld(server);
+        if (incomingConnectionsClosed) {
             return Optional.empty();
         }
 
@@ -61,6 +69,11 @@ public final class LanHostService {
             return Optional.empty();
         }
 
+        resetStateForDifferentWorld(server);
+        if (incomingConnectionsClosed) {
+            return Optional.empty();
+        }
+
         int port = server.getPort();
         return port > 0 ? Optional.of(port) : Optional.empty();
     }
@@ -80,11 +93,20 @@ public final class LanHostService {
             return false;
         }
 
-        if (server.getConnection() == null) {
+        resetStateForDifferentWorld(server);
+        if (incomingConnectionsClosed || server.getConnection() == null) {
             return false;
         }
 
         server.getConnection().stop();
+        incomingConnectionsClosed = true;
         return true;
+    }
+
+    private static void resetStateForDifferentWorld(IntegratedServer server) {
+        if (trackedServer != server) {
+            trackedServer = server;
+            incomingConnectionsClosed = false;
+        }
     }
 }
