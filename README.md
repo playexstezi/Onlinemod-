@@ -20,13 +20,21 @@ The project will therefore be designed in stages:
 
 Do not post a public IP address in public chats. Share it only with people you trust.
 
-## Current diagnostic command
+## Current commands
 
-After installing the mod, enter `/onlinemod ip` in-game to check the public IPv4 address. This is a diagnostic only: the integrated server is not yet exposed to the internet, and the command does not open router ports.
+Commands are temporary controls while the in-game screens are being developed:
+
+- `/onlinemod ip` checks the public IPv4 address. This does not prove that inbound connections work.
+- `/onlinemod host` opens the current single-player world using Minecraft's integrated-server LAN publication on a random port. The command does not configure your router or firewall.
+- `/onlinemod stop` closes the integrated server's incoming network listener while leaving the world running. In this first implementation, hosting cannot be restarted until the world is closed and opened again.
+
+**Important:** LAN publication alone is not internet hosting. Friends outside your local network will only be able to connect after a suitable router port mapping and firewall rule are in place. CGNAT or restrictive networks may prevent direct hosting entirely. The public IP and port are not shown as a working internet address until reachability checks exist.
 
 ## Development status
 
-Initial Forge project scaffold. Networking, in-game screens, NAT traversal, and relay are not implemented yet. Compatibility with large modpacks must be tested; it is not claimed until tested.
+Implemented so far: Forge project scaffold, public IPv4 discovery, connection-address parsing, and a first integrated-server LAN open/close service exposed through temporary commands.
+
+Still in progress: in-game host/join screens, verified external reachability, router mapping with explicit consent, and optional relay support. Compatibility with large modpacks must be tested; it is not claimed until tested.
 
 ## Build
 
