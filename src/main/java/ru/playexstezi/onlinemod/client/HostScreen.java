@@ -31,7 +31,7 @@ public final class HostScreen extends Screen {
         int center = this.width / 2;
         int buttonWidth = 200;
         int buttonX = center - buttonWidth / 2;
-        int top = this.height / 2 - 36;
+        int top = this.height / 2 - 48;
 
         this.addRenderableWidget(Button.builder(
                 Component.literal("Start hosting"),
@@ -44,14 +44,19 @@ public final class HostScreen extends Screen {
         ).bounds(buttonX, top + 26, buttonWidth, 20).build());
 
         this.addRenderableWidget(Button.builder(
-                Component.literal("Refresh public IP"),
-                button -> refreshPublicIp()
+                Component.literal("Join friend's world"),
+                button -> Minecraft.getInstance().setScreen(new JoinScreen(this))
         ).bounds(buttonX, top + 52, buttonWidth, 20).build());
 
         this.addRenderableWidget(Button.builder(
+                Component.literal("Refresh public IP"),
+                button -> refreshPublicIp()
+        ).bounds(buttonX, top + 78, buttonWidth, 20).build());
+
+        this.addRenderableWidget(Button.builder(
                 Component.literal("Back"),
-                button -> this.minecraft.setScreen(parent)
-        ).bounds(buttonX, top + 84, buttonWidth, 20).build());
+                button -> Minecraft.getInstance().setScreen(parent)
+        ).bounds(buttonX, top + 110, buttonWidth, 20).build());
 
         refreshPublicIp();
         refreshSessionState();
@@ -141,14 +146,14 @@ public final class HostScreen extends Screen {
                 this.font,
                 Component.literal(this.status),
                 this.width / 2,
-                this.height / 2 + 76,
+                this.height / 2 + 100,
                 0xFFFFFF
         );
         graphics.drawCenteredString(
                 this.font,
                 Component.literal("A public IP does not mean friends can connect yet."),
                 this.width / 2,
-                this.height / 2 + 90,
+                this.height / 2 + 114,
                 0xAAAAAA
         );
         super.render(graphics, mouseX, mouseY, partialTick);
