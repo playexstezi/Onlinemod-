@@ -1,5 +1,8 @@
 package ru.playexstezi.onlinemod.network;
 
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Optional;
 
 /**
@@ -8,8 +11,8 @@ import java.util.Optional;
  */
 public record ConnectionAddress(String host, int port) {
     public ConnectionAddress {
-        if (host == null || host.isBlank()) {
-            throw new IllegalArgumentException("Host cannot be empty");
+        if (!isValidHost(host)) {
+            throw new IllegalArgumentException("Host must be a valid hostname, IPv4 address, or IPv6 literal");
         }
         if (port < 1 || port > 65535) {
             throw new IllegalArgumentException("Port must be between 1 and 65535");
@@ -37,7 +40,7 @@ public record ConnectionAddress(String host, int port) {
             }
             host = value.substring(1, closingBracket);
             portText = value.substring(closingBracket + 2);
-            if (!host.contains(":")) {
+            if (!host.contains(":") || !isValidIpv6(host)) {
                 return Optional.empty();
             }
         } else {
@@ -49,8 +52,7 @@ public record ConnectionAddress(String host, int port) {
             portText = value.substring(separator + 1);
         }
 
-        if (host.isBlank() || portText.isBlank()
-                || !portText.chars().allMatch(Character::isDigit)) {
+        if (portText.isEmpty() || !portText.chars().allMatch(c -> c >= '0' && c <= '9')) {
             return Optional.empty();
         }
 
@@ -60,8 +62,75 @@ public record ConnectionAddress(String host, int port) {
                 return Optional.empty();
             }
             return Optional.of(new ConnectionAddress(host, port));
-        } catch (NumberFormatException ignored) {
+        } catch (NumberFormatException | IllegalArgumentException ignored) {
             return Optional.empty();
+        }
+    }
+
+    private static boolean isValidHost(String host) {
+        if (host == null || host.isEmpty() || !host.equals(host.trim())) {
+            return false;
+        }
+        if (host.indexOf(':') >= 0) {
+            return isValidIpv6(host);
+        }
+        if (host.matches("[0-9.]+")) {
+            return isValidIpv4(host);
+        }
+        if (host.length() > 253) {
+            return false;
+        }
+
+        String name = host.endsWith(".") ? host.substring(0, host.length() - 1) : host;
+        if (name.isEmpty()) {
+            return false;
+        }
+        for (String label : name.split("\\.", -1)) {
+            if (label.isEmpty() || label.length() > 63
+                    || label.charAt(0) == '-' || label.charAt(label.length() - 1) == '-') {
+                return false;
+            }
+            for (int i = 0; i < label.length(); i++) {
+                char c = label.charAt(i);
+                if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
+                        || (c >= '0' && c <= '9') || c == '-')) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private static boolean isValidIpv4(String host) {
+        String[] parts = host.split("\\.", -1);
+        if (parts.length != 4) {
+            return false;
+        }
+        for (String part : parts) {
+            if (part.isEmpty() || part.length() > 3
+                    || !part.chars().allMatch(c -> c >= '0' && c <= '9')) {
+                return false;
+            }
+            try {
+                if (Integer.parseInt(part) > 255) {
+                    return false;
+                }
+            } catch (NumberFormatException ignored) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean isValidIpv6(String host) {
+        if (host == null || host.isEmpty() || host.indexOf('%') >= 0
+                || !host.matches("[0-9a-fA-F:.]+")) {
+            return false;
+        }
+        try {
+            return InetAddress.getByName(host) instanceof Inet6Address;
+        } catch (UnknownHostException ignored) {
+            return false;
         }
     }
 
