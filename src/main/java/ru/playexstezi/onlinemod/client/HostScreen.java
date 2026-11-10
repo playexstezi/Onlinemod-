@@ -9,6 +9,7 @@ import net.minecraft.network.chat.Component;
 import ru.playexstezi.onlinemod.network.LanHostService;
 import ru.playexstezi.onlinemod.network.LocalAddressService;
 import ru.playexstezi.onlinemod.network.PublicIpService;
+import ru.playexstezi.onlinemod.network.UpnpPortMapper;
 
 import java.util.Optional;
 
@@ -19,6 +20,7 @@ public final class HostScreen extends Screen {
     private String localIp = "onlinemod.status.checking";
     private String status = "onlinemod.status.idle";
     private int publishedPort = -1;
+    private String upnpDetail = "";
 
     public HostScreen(Screen parent) {
         super(Component.translatable("onlinemod.screen.host.title"));
@@ -48,9 +50,11 @@ public final class HostScreen extends Screen {
                 button -> copyLanAddress()).bounds(buttonX, top + step * 5, buttonWidth, 20).build());
         this.addRenderableWidget(Button.builder(Component.translatable("onlinemod.button.copy_public_candidate"),
                 button -> copyPublicCandidate()).bounds(buttonX, top + step * 6, buttonWidth, 20).build());
+        this.addRenderableWidget(Button.builder(Component.translatable("onlinemod.button.upnp_toggle"),
+                button -> toggleUpnp()).bounds(buttonX, top + step * 7, buttonWidth, 20).build());
         this.addRenderableWidget(Button.builder(Component.translatable("gui.back"),
                 button -> Minecraft.getInstance().setScreen(parent))
-                .bounds(buttonX, top + step * 7 + 4, buttonWidth, 20).build());
+                .bounds(buttonX, top + step * 8 + 4, buttonWidth, 20).build());
 
         refreshAddresses();
         refreshSessionState();
@@ -98,6 +102,35 @@ public final class HostScreen extends Screen {
         }
         Minecraft.getInstance().keyboardHandler.setClipboard(this.publicIp + ":" + this.publishedPort);
         this.status = "onlinemod.status.public_candidate_copied";
+    }
+
+    private void toggleUpnp() {
+        if (UpnpPortMapper.isActive()) {
+            this.status = "onlinemod.status.upnp_closing";
+            this.upnpDetail = "";
+            UpnpPortMapper.closeAsync().thenAccept(closed ->
+                    Minecraft.getInstance().execute(() -> {
+                        this.status = closed
+                                ? "onlinemod.status.upnp_closed"
+                                : "onlinemod.status.upnp_cleanup_failed";
+                    }));
+            return;
+        }
+
+        if (this.publishedPort < 1 || !isReady(this.localIp)) {
+            this.status = "onlinemod.status.upnp_needs_host";
+            return;
+        }
+
+        this.status = "onlinemod.status.upnp_searching";
+        this.upnpDetail = "";
+        UpnpPortMapper.mapAsync(this.localIp, this.publishedPort).thenAccept(result ->
+                Minecraft.getInstance().execute(() -> {
+                    this.status = result.success()
+                            ? "onlinemod.status.upnp_active"
+                            : "onlinemod.status.upnp_failed";
+                    this.upnpDetail = result.message();
+                }));
     }
 
     private static boolean isReady(String value) {
@@ -164,11 +197,15 @@ public final class HostScreen extends Screen {
                 : Component.translatable("onlinemod.label.port_closed");
         graphics.drawCenteredString(this.font, portText, center, panelTop + 51, 0xFFD0D8E2);
         graphics.drawCenteredString(this.font, Component.translatable(this.status),
-                center, panelTop + 275, 0xFFFFD479);
+                center, panelTop + 263, 0xFFFFD479);
+        if (!this.upnpDetail.isEmpty()) {
+            graphics.drawCenteredString(this.font, Component.literal(this.upnpDetail),
+                    center, panelTop + 276, 0xFFD0D8E2);
+        }
         graphics.drawCenteredString(this.font, Component.translatable("onlinemod.label.internet_warning"),
-                center, panelTop + 289, 0xFFB8C3D0);
+                center, panelTop + 292, 0xFFB8C3D0);
         graphics.drawCenteredString(this.font, Component.translatable("onlinemod.label.forwarding_hint"),
-                center, panelTop + 301, 0xFFB8C3D0);
+                center, panelTop + 304, 0xFFB8C3D0);
         super.render(graphics, mouseX, mouseY, partialTick);
     }
 
