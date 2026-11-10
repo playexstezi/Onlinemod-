@@ -34,5 +34,8 @@
   "onlinemod.label.forwarding_hint": "Internet play needs router and firewall TCP port rules.",
   "onlinemod.label.server_address": "Server address",
   "onlinemod.label.join_hint": "Enter the address shared by the host (host:port).",
-  "onlinemod.error.invalid_address": "Enter a valid address in host:port format."
+  "onlinemod.error.invalid_address": "Enter a valid address in host:port format.",
+  "onlinemod.button.copy_public_candidate": "Copy public address candidate",
+  "onlinemod.status.public_candidate_not_ready": "Open a world and wait for the public IP first.",
+  "onlinemod.status.public_candidate_copied": "Address copied. It works only after router and firewall setup."
 }
