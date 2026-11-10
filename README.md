@@ -22,7 +22,9 @@ Do not post a public IP address in public chats. Share it only with people you t
 
 ## Current commands
 
-Commands are temporary controls while the in-game screens are being developed:
+Open the in-game pause menu and select **Online Mod** to open the first host-management screen. It can start the vanilla LAN listener, stop incoming connections, and refresh the detected public IPv4 address. The screen deliberately labels the game port as LAN-only until external reachability can be verified.
+
+Commands are also available for diagnostics and troubleshooting:
 
 - `/onlinemod ip` checks the public IPv4 address. This does not prove that inbound connections work.
 - `/onlinemod host` opens the current single-player world using Minecraft's integrated-server LAN publication on a random port. The command does not configure your router or firewall.
@@ -32,9 +34,9 @@ Commands are temporary controls while the in-game screens are being developed:
 
 ## Development status
 
-Implemented so far: Forge project scaffold, public IPv4 discovery, connection-address parsing, and a first integrated-server LAN open/close service exposed through temporary commands.
+Implemented so far: Forge project scaffold, public IPv4 discovery, connection-address parsing, integrated-server LAN open/close service, initial pause-menu host screen, and unit tests for address parsing.
 
-Still in progress: in-game host/join screens, verified external reachability, router mapping with explicit consent, and optional relay support. Compatibility with large modpacks must be tested; it is not claimed until tested.
+Still in progress: join screen, verified external reachability, router mapping with explicit consent, and optional relay support. Compatibility with large modpacks must be tested; it is not claimed until tested.
 
 ## Build
 
