@@ -2,7 +2,7 @@
 
 ## Current connection path
 
-The host screen publishes the vanilla integrated server using Minecraft's LAN publication API. The game selects an available TCP port. The host screen displays the public-facing IPv4 and a best-effort local IPv4. The Copy LAN address button copies local-address:port for friends on the same network.
+The host screen publishes the vanilla integrated server using Minecraft's LAN publication API. The game selects an available TCP port. The host screen displays the public-facing IPv4 and a best-effort local IPv4. The Copy LAN address button copies local-address:port for friends on the same network. The Copy public address candidate button copies public-ip:port as a convenience only; it is explicitly unverified and does not indicate that forwarding is configured.
 
 The local address is selected using the operating system's route choice where possible. PCs with multiple adapters or VPN software may need the user to confirm the correct Wi-Fi/Ethernet address. Public IPv4 discovery only reports what an HTTPS provider sees; it does not prove that the game port is reachable.
 
