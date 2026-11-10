@@ -99,12 +99,14 @@ public final class LanHostService {
         }
 
         server.getConnection().stop();
+        UpnpPortMapper.closeAsync();
         incomingConnectionsClosed = true;
         return true;
     }
 
     private static void resetStateForDifferentWorld(IntegratedServer server) {
         if (trackedServer != server) {
+            if (trackedServer != null) UpnpPortMapper.closeAsync();
             trackedServer = server;
             incomingConnectionsClosed = false;
         }
