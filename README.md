@@ -20,6 +20,10 @@ The project will therefore be designed in stages:
 
 Do not post a public IP address in public chats. Share it only with people you trust.
 
+## Current diagnostic command
+
+After installing the mod, enter `/onlinemod ip` in-game to check the public IPv4 address. This is a diagnostic only: the integrated server is not yet exposed to the internet, and the command does not open router ports.
+
 ## Development status
 
 Initial Forge project scaffold. Networking, in-game screens, NAT traversal, and relay are not implemented yet. Compatibility with large modpacks must be tested; it is not claimed until tested.
