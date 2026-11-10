@@ -1,5 +1,6 @@
 package ru.playexstezi.onlinemod.client;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
@@ -27,7 +28,7 @@ public final class ScreenHooks {
 
         event.addListener(Button.builder(
                 Component.literal("Online Mod"),
-                button -> screen.getMinecraft().setScreen(new HostScreen(screen))
+                button -> Minecraft.getInstance().setScreen(new HostScreen(screen))
         ).bounds(screen.width / 2 - 100, screen.height - 28, 200, 20).build());
     }
 }
