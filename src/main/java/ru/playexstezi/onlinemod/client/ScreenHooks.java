@@ -3,6 +3,7 @@ package ru.playexstezi.onlinemod.client;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.PauseScreen;
+import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
@@ -22,13 +23,19 @@ public final class ScreenHooks {
     @SubscribeEvent
     public static void onScreenInit(ScreenEvent.Init.Post event) {
         Screen screen = event.getScreen();
-        if (!(screen instanceof PauseScreen)) {
+        if (screen instanceof PauseScreen) {
+            event.addListener(Button.builder(
+                    Component.literal("Online Mod"),
+                    button -> Minecraft.getInstance().setScreen(new HostScreen(screen))
+            ).bounds(screen.width / 2 - 100, screen.height - 28, 200, 20).build());
             return;
         }
 
-        event.addListener(Button.builder(
-                Component.literal("Online Mod"),
-                button -> Minecraft.getInstance().setScreen(new HostScreen(screen))
-        ).bounds(screen.width / 2 - 100, screen.height - 28, 200, 20).build());
+        if (screen instanceof JoinMultiplayerScreen) {
+            event.addListener(Button.builder(
+                    Component.literal("Join via Online Mod"),
+                    button -> Minecraft.getInstance().setScreen(new JoinScreen(screen))
+            ).bounds(screen.width / 2 - 100, screen.height - 52, 200, 20).build());
+        }
     }
 }
