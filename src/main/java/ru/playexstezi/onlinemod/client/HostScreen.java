@@ -138,9 +138,9 @@ public final class HostScreen extends Screen {
         int center = this.width / 2;
         int panelWidth = Math.min(360, this.width - 20);
         int panelLeft = center - panelWidth / 2;
-        int panelTop = this.height / 2 - 92;
+        int panelTop = this.height / 2 - 116;
 
-        graphics.fill(panelLeft, panelTop, panelLeft + panelWidth, panelTop + 206, 0xB0101722);
+        graphics.fill(panelLeft, panelTop, panelLeft + panelWidth, panelTop + 246, 0xB0101722);
         graphics.fill(panelLeft, panelTop, panelLeft + panelWidth, panelTop + 1, 0xFF4A9BD8);
 
         graphics.drawCenteredString(this.font, this.title, center, panelTop + 10, 0xFFFFFFFF);
