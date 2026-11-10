@@ -30,7 +30,7 @@ public final class HostScreen extends Screen {
         int center = this.width / 2;
         int buttonWidth = Math.min(220, this.width - 40);
         int buttonX = center - buttonWidth / 2;
-        int top = this.height / 2 - 84;
+        int top = this.height / 2 - 98;
         int step = 22;
 
         this.addRenderableWidget(Button.builder(Component.translatable("onlinemod.button.start_hosting"),
@@ -46,9 +46,11 @@ public final class HostScreen extends Screen {
                 button -> copyPublicIp()).bounds(buttonX, top + step * 4, buttonWidth, 20).build());
         this.addRenderableWidget(Button.builder(Component.translatable("onlinemod.button.copy_lan"),
                 button -> copyLanAddress()).bounds(buttonX, top + step * 5, buttonWidth, 20).build());
+        this.addRenderableWidget(Button.builder(Component.translatable("onlinemod.button.copy_public_candidate"),
+                button -> copyPublicCandidate()).bounds(buttonX, top + step * 6, buttonWidth, 20).build());
         this.addRenderableWidget(Button.builder(Component.translatable("gui.back"),
                 button -> Minecraft.getInstance().setScreen(parent))
-                .bounds(buttonX, top + step * 6 + 4, buttonWidth, 20).build());
+                .bounds(buttonX, top + step * 7 + 4, buttonWidth, 20).build());
 
         refreshAddresses();
         refreshSessionState();
@@ -87,6 +89,15 @@ public final class HostScreen extends Screen {
         }
         Minecraft.getInstance().keyboardHandler.setClipboard(this.localIp + ":" + this.publishedPort);
         this.status = "onlinemod.status.lan_address_copied";
+    }
+
+    private void copyPublicCandidate() {
+        if (this.publishedPort < 1 || !isReady(this.publicIp)) {
+            this.status = "onlinemod.status.public_candidate_not_ready";
+            return;
+        }
+        Minecraft.getInstance().keyboardHandler.setClipboard(this.publicIp + ":" + this.publishedPort);
+        this.status = "onlinemod.status.public_candidate_copied";
     }
 
     private static boolean isReady(String value) {
@@ -136,10 +147,10 @@ public final class HostScreen extends Screen {
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         this.renderBackground(graphics);
         int center = this.width / 2;
-        int panelWidth = Math.min(380, this.width - 20);
+        int panelWidth = Math.min(390, this.width - 20);
         int panelLeft = center - panelWidth / 2;
-        int panelTop = this.height / 2 - 142;
-        graphics.fill(panelLeft, panelTop, panelLeft + panelWidth, panelTop + 286, 0xB0101722);
+        int panelTop = this.height / 2 - 165;
+        graphics.fill(panelLeft, panelTop, panelLeft + panelWidth, panelTop + 340, 0xB0101722);
         graphics.fill(panelLeft, panelTop, panelLeft + panelWidth, panelTop + 1, 0xFF4A9BD8);
         graphics.drawCenteredString(this.font, this.title, center, panelTop + 9, 0xFFFFFFFF);
         graphics.drawCenteredString(this.font,
@@ -153,11 +164,11 @@ public final class HostScreen extends Screen {
                 : Component.translatable("onlinemod.label.port_closed");
         graphics.drawCenteredString(this.font, portText, center, panelTop + 51, 0xFFD0D8E2);
         graphics.drawCenteredString(this.font, Component.translatable(this.status),
-                center, panelTop + 226, 0xFFFFD479);
+                center, panelTop + 275, 0xFFFFD479);
         graphics.drawCenteredString(this.font, Component.translatable("onlinemod.label.internet_warning"),
-                center, panelTop + 238, 0xFFB8C3D0);
+                center, panelTop + 289, 0xFFB8C3D0);
         graphics.drawCenteredString(this.font, Component.translatable("onlinemod.label.forwarding_hint"),
-                center, panelTop + 250, 0xFFB8C3D0);
+                center, panelTop + 301, 0xFFB8C3D0);
         super.render(graphics, mouseX, mouseY, partialTick);
     }
 
