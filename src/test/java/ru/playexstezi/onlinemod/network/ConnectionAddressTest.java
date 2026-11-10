@@ -27,11 +27,31 @@ class ConnectionAddressTest {
     }
 
     @Test
+    void rejectsMalformedHosts() {
+        assertTrue(ConnectionAddress.parse("bad host:25565").isEmpty());
+        assertTrue(ConnectionAddress.parse("-bad.example:25565").isEmpty());
+        assertTrue(ConnectionAddress.parse("bad..example:25565").isEmpty());
+        assertTrue(ConnectionAddress.parse("256.1.1.1:25565").isEmpty());
+        assertTrue(ConnectionAddress.parse("1.2.3:25565").isEmpty());
+        assertTrue(ConnectionAddress.parse("[not-ipv6]:25565").isEmpty());
+        assertTrue(ConnectionAddress.parse("[2001:db8:::1]:25565").isEmpty());
+    }
+
+    @Test
+    void acceptsLocalAndSingleLabelHostnames() {
+        assertEquals("localhost:25565",
+                ConnectionAddress.parse("localhost:25565").orElseThrow().format());
+        assertEquals("server:25565",
+                ConnectionAddress.parse("server:25565").orElseThrow().format());
+    }
+
+    @Test
     void rejectsMissingOrInvalidPort() {
         assertTrue(ConnectionAddress.parse("example.net").isEmpty());
         assertTrue(ConnectionAddress.parse("example.net:0").isEmpty());
         assertTrue(ConnectionAddress.parse("example.net:65536").isEmpty());
         assertTrue(ConnectionAddress.parse("example.net:abc").isEmpty());
+        assertTrue(ConnectionAddress.parse("example.net:+25565").isEmpty());
     }
 
     @Test
@@ -46,5 +66,6 @@ class ConnectionAddressTest {
         assertTrue(ConnectionAddress.parse(" ").isEmpty());
         assertThrows(IllegalArgumentException.class, () -> new ConnectionAddress("", 25565));
         assertThrows(IllegalArgumentException.class, () -> new ConnectionAddress("example.net", 0));
+        assertThrows(IllegalArgumentException.class, () -> new ConnectionAddress("bad host", 25565));
     }
 }
