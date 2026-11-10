@@ -34,5 +34,8 @@
   "onlinemod.label.forwarding_hint": "Для интернета нужен TCP-порт в роутере и брандмауэре.",
   "onlinemod.label.server_address": "Адрес сервера",
   "onlinemod.label.join_hint": "Введи адрес, который прислал хозяин мира (хост:порт).",
-  "onlinemod.error.invalid_address": "Введи корректный адрес в формате хост:порт."
+  "onlinemod.error.invalid_address": "Введи корректный адрес в формате хост:порт.",
+  "onlinemod.button.copy_public_candidate": "Скопировать внешний адрес-кандидат",
+  "onlinemod.status.public_candidate_not_ready": "Сначала открой мир и дождись внешнего IP.",
+  "onlinemod.status.public_candidate_copied": "Адрес скопирован. Он сработает только после настройки роутера и firewall."
 }
