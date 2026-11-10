@@ -197,15 +197,15 @@ public final class HostScreen extends Screen {
                 : Component.translatable("onlinemod.label.port_closed");
         graphics.drawCenteredString(this.font, portText, center, panelTop + 51, 0xFFD0D8E2);
         graphics.drawCenteredString(this.font, Component.translatable(this.status),
-                center, panelTop + 263, 0xFFFFD479);
+                center, panelTop + 284, 0xFFFFD479);
         if (!this.upnpDetail.isEmpty()) {
-            graphics.drawCenteredString(this.font, Component.literal(this.upnpDetail),
-                    center, panelTop + 276, 0xFFD0D8E2);
+            graphics.drawCenteredString(this.font, Component.literal(this.font.plainSubstrByWidth(this.upnpDetail, panelWidth - 24)),
+                    center, panelTop + 297, 0xFFD0D8E2);
         }
         graphics.drawCenteredString(this.font, Component.translatable("onlinemod.label.internet_warning"),
-                center, panelTop + 292, 0xFFB8C3D0);
+                center, panelTop + 313, 0xFFB8C3D0);
         graphics.drawCenteredString(this.font, Component.translatable("onlinemod.label.forwarding_hint"),
-                center, panelTop + 304, 0xFFB8C3D0);
+                center, panelTop + 325, 0xFFB8C3D0);
         super.render(graphics, mouseX, mouseY, partialTick);
     }
 
