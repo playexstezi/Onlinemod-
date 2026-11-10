@@ -2,53 +2,30 @@
 
 ## Current connection path
 
-The host screen publishes the vanilla integrated server using Minecraft's LAN publication API. The game selects an available port. The join screen parses a user-supplied endpoint and delegates the connection to Minecraft's normal `ConnectScreen` flow.
+The host screen publishes the vanilla integrated server using Minecraft's LAN publication API. The game selects an available TCP port. The host screen displays the public-facing IPv4 and a best-effort local IPv4. The Copy LAN address button copies local-address:port for friends on the same network.
 
-The public IPv4 service asks external HTTPS providers what address they see for the host. This only discovers the public-facing address; it does not prove that a TCP connection can reach the Minecraft listener.
+The local address is selected using the operating system's route choice where possible. PCs with multiple adapters or VPN software may need the user to confirm the correct Wi-Fi/Ethernet address. Public IPv4 discovery only reports what an HTTPS provider sees; it does not prove that the game port is reachable.
 
-## What is required for direct internet hosting
+## Direct internet setup (manual router configuration)
 
-A direct public connection requires all of these:
+This build does not configure routers automatically. To attempt a direct connection over the internet:
 
-1. The integrated server is listening on the selected TCP port.
-2. The host operating-system firewall allows inbound TCP traffic to that port.
-3. The router forwards the same port to the host PC's private LAN address, or an equivalent mapping exists.
-4. The ISP permits inbound traffic and does not place the connection behind restrictive CGNAT.
-5. The joining player can reach the host network.
+1. Open a single-player world and start hosting in Online Mod.
+2. Note the Local IPv4 and Server port shown in the host screen.
+3. In the router administration interface, create a TCP port-forward rule. Set the external port to the server port shown by the mod, and forward it to the host PC's local IPv4 address using that same internal port.
+4. In the host PC firewall, allow inbound TCP traffic for the Minecraft/Java process or that specific port on the appropriate network profile.
+5. Keep the world open and hosting active. The selected port can change after the world is closed and reopened, so re-check the rule each session.
+6. Give the joining player the public IPv4 plus the forwarded external port, in address:port format. They should test from a different internet connection, not the same Wi-Fi.
+7. If it still fails, the ISP may use CGNAT or block inbound connections. Ordinary router port forwarding cannot solve that.
 
-A successful public-IP lookup proves none of items 1–5 except that the lookup provider observed a public-facing address.
+Only change router settings if you are authorized to administer that network. Never share router passwords or administrator credentials. Public IP addresses can reveal approximate network location; share them only with people you trust.
 
-## Port mapping policy
+## Requirements and limitations
 
-UPnP/NAT-PMP is **not implemented**. Any future implementation must:
-- be disabled by default or require a clear opt-in action;
-- explain exactly which TCP port is requested and why;
-- request only the Minecraft listener port;
-- show whether the mapping succeeded and its lease duration;
-- remove the mapping when the session stops or the client exits;
-- handle routers where UPnP/NAT-PMP is disabled or unavailable;
-- never claim that a mapping guarantees reachability.
+Direct hosting requires a listening game server, an inbound firewall rule, a router TCP port-forward, ISP support for inbound connections, and a joining player who can reach the host network. UPnP/NAT-PMP is not implemented. The mod does not silently change router settings and does not attempt to bypass ISP restrictions.
 
-Do not silently change router settings. Do not attempt to bypass ISP restrictions.
+A reliable external reachability check needs a probe originating outside the host network. No external probe service is configured in this repository yet. A relay fallback requires a separately operated public server, bandwidth, authentication, abuse prevention, and transport integration compatible with Minecraft. GitHub is not a game relay.
 
-## Reachability checks
+## Privacy and compatibility
 
-A reliable external check needs a probe that originates outside the host's network and connects to the actual listener. Testing the public address from inside the same LAN is not reliable because routers differ in NAT loopback support. A local socket check or successful public-IP lookup must never be presented as an external reachability test.
-
-A future probe service would need a documented protocol, abuse limits, privacy controls, and an operational endpoint. No such service is configured in this repository yet.
-
-## Relay fallback
-
-A relay is the fallback for networks where direct inbound connections are impossible. It requires a real, publicly reachable relay service, bandwidth, authentication, abuse prevention, and a transport integration compatible with Minecraft's networking stack. A GitHub repository or GitHub Actions runner is not a persistent relay server.
-
-## Privacy and safety
-
-- Public IP addresses are connection information. Show them only in the host's UI and let the host choose when to copy/share them.
-- Do not upload public IPs to a project backend.
-- Do not log public IPs or connection addresses.
-- Avoid exposing router credentials or asking users to paste them into the mod.
-- Keep router changes opt-in and reversible.
-
-## Modpack compatibility
-
-The joining client must have compatible Minecraft/Forge versions and matching required mods/configuration. A network connection alone cannot make incompatible registries, entities, blocks, or packets compatible. Test large packs on both host and client before claiming support.
+Do not upload or log public IPs or connection addresses. Avoid exposing router credentials. Joining clients need compatible Minecraft/Forge versions and matching required mods/configuration. Large modpacks have not yet been compatibility-tested.
