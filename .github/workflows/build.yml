@@ -29,5 +29,13 @@ jobs:
         with:
           gradle-version: '8.8'
 
-      - name: Build mod
-        run: gradle build --no-daemon
+      - name: Build mod and run tests
+        run: gradle clean build --no-daemon
+
+      - name: Upload installable mod JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: OnlineMod-1.20.1-Forge
+          path: build/libs/*.jar
+          if-no-files-found: error
+          retention-days: 14
